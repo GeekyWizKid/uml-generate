@@ -2,6 +2,12 @@
 
 一个基于AI的UML图生成工具，**采用纯前端架构**，支持多个AI服务商，可以根据用户输入的需求文档生成包含交互图、活动图和状态图的完整UML设计文档。
 
+## 作者
+
+👨‍💻 **GeekyWizKid**  
+🐦 Twitter: [@named_Das](https://x.com/named_Das)  
+🐱 GitHub: [@GeekyWizKid](https://github.com/GeekyWizKid)
+
 ## 功能特性
 
 - 🤖 **多AI支持**: 集成ChatGPT、Claude、DeepSeek、Kimi四个主流AI服务
@@ -199,3 +205,8 @@ npm run preview
 ## 许可证
 
 MIT License
+
+---
+
+**Made with ❤️ by [GeekyWizKid](https://github.com/GeekyWizKid)**  
+🐦 Follow me on Twitter: [@named_Das](https://x.com/named_Das)

@@ -13,7 +13,18 @@
     "vercel-build": "cd client && npm install && npm run build"
   },
   "keywords": ["uml", "diagram", "plantuml", "ai", "generation"],
-  "author": "",
+  "author": {
+    "name": "GeekyWizKid", 
+    "url": "https://github.com/GeekyWizKid"
+  },
+  "homepage": "https://github.com/GeekyWizKid/uml-generate#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/GeekyWizKid/uml-generate.git"
+  },
+  "bugs": {
+    "url": "https://github.com/GeekyWizKid/uml-generate/issues"
+  },
   "license": "MIT",
   "devDependencies": {
     "concurrently": "^8.2.2"
