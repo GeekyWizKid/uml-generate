@@ -386,7 +386,12 @@ function App() {
                   {/* UML图表 */}
                   <div className="result-section">
                     <h3 className="section-title">UML图表</h3>
-                    <PlantUMLRenderer content={result.content} />
+                    <PlantUMLRenderer 
+                      content={result.content} 
+                      onContentChange={(updatedContent) => {
+                        setResult(prev => ({ ...prev, content: updatedContent }));
+                      }}
+                    />
                   </div>
                 </div>
               </div>
