@@ -1,8 +1,5 @@
 {
   "version": 2,
-  "buildCommand": "cd client && npm install && npm run build",
-  "outputDirectory": "client/dist",
-  "installCommand": "npm install && cd client && npm install && cd ../server && npm install",
   "builds": [
     {
       "src": "server/index.js",
@@ -10,16 +7,31 @@
       "config": {
         "maxDuration": 30
       }
+    },
+    {
+      "src": "client/package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "dist"
+      }
     }
   ],
   "routes": [
     {
       "src": "/api/(.*)",
-      "dest": "/server/index.js"
+      "dest": "server/index.js"
+    },
+    {
+      "src": "/assets/(.*)",
+      "dest": "client/dist/assets/$1"
+    },
+    {
+      "src": "/vite.svg",
+      "dest": "client/dist/vite.svg"
     },
     {
       "src": "/(.*)",
-      "dest": "/client/dist/$1"
+      "dest": "client/dist/index.html"
     }
   ],
   "env": {
