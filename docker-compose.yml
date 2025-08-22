@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  plantuml-server:
+    image: plantuml/plantuml-server:jetty
+    container_name: uml-plantuml-server
+    ports:
+      - "8080:8080"
+    environment:
+      - PLANTUML_LIMIT_SIZE=4096
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8080/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # 可选：添加一个简单的Web界面
+  plantuml-editor:
+    image: plantuml/plantuml-server:jetty
+    container_name: uml-plantuml-editor
+    ports:
+      - "8081:8080"
+    environment:
+      - PLANTUML_LIMIT_SIZE=4096
+    restart: unless-stopped
