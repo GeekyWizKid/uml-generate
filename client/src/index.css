@@ -1,4 +1,4 @@
-/* 全局样式 */
+/* Notion风格 - 温暖灰色设计 */
 * {
   box-sizing: border-box;
   margin: 0;
@@ -7,28 +7,27 @@
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  min-height: 100vh;
-  color: #2d3748;
+  background: #fbfbfa;
+  color: #37352f;
   line-height: 1.6;
+  min-height: 100vh;
 }
 
 .container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0 1.5rem;
+  padding: 0 2rem;
 }
 
-/* 头部样式 - 现代玻璃态设计 */
+/* 头部样式 - Notion简洁风格 */
 .header {
   background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(20px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-  padding: 1.5rem 0;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  border-bottom: 1px solid #e9e9e7;
+  padding: 1rem 0;
   position: sticky;
   top: 0;
   z-index: 100;
+  backdrop-filter: blur(8px);
 }
 
 .header-content {
@@ -40,67 +39,48 @@ body {
 }
 
 .logo {
-  font-size: 2rem;
-  font-weight: 800;
-  background: linear-gradient(135deg, #667eea, #764ba2);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  letter-spacing: -0.02em;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #37352f;
+  letter-spacing: -0.01em;
 }
 
-/* 作者链接样式 - 精致设计 */
+/* 作者链接样式 - 简洁圆润 */
 .author-links {
   display: flex;
   gap: 0.5rem;
   align-items: center;
-  margin-left: 1.5rem;
+  margin-left: 1rem;
 }
 
 .author-link {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
-  border-radius: 12px;
-  background: linear-gradient(135deg, #f8fafc, #e2e8f0);
-  border: 1px solid rgba(148, 163, 184, 0.2);
-  color: #64748b;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: #f1f1ef;
+  border: 1px solid #e9e9e7;
+  color: #787774;
   text-decoration: none;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  position: relative;
-  overflow: hidden;
-}
-
-.author-link::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
-  transition: left 0.5s;
-}
-
-.author-link:hover::before {
-  left: 100%;
+  transition: all 0.15s ease;
 }
 
 .author-link:hover {
-  transform: translateY(-2px) scale(1.05);
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+  background: #e9e9e7;
+  color: #37352f;
+  transform: translateY(-1px);
 }
 
 .github-link:hover {
-  background: linear-gradient(135deg, #24292e, #1a1e23);
+  background: #37352f;
   color: white;
-  border-color: #24292e;
+  border-color: #37352f;
 }
 
 .twitter-link:hover {
-  background: linear-gradient(135deg, #1da1f2, #0d8bd9);
+  background: #1da1f2;
   color: white;
   border-color: #1da1f2;
 }
@@ -108,84 +88,62 @@ body {
 .header-actions {
   display: flex;
   align-items: center;
-  gap: 1.5rem;
+  gap: 1rem;
   flex-wrap: wrap;
 }
 
-/* 现代按钮设计 */
+/* Notion风格按钮 */
 .api-config-btn {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  padding: 0.75rem 1.25rem;
-  background: linear-gradient(135deg, #4f46e5, #7c3aed);
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  background: #2383e2;
   color: white;
   border: none;
-  border-radius: 12px;
+  border-radius: 6px;
   font-size: 0.875rem;
-  font-weight: 600;
+  font-weight: 500;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 4px 14px rgba(79, 70, 229, 0.3);
-  position: relative;
-  overflow: hidden;
-}
-
-.api-config-btn::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-  transition: left 0.5s;
-}
-
-.api-config-btn:hover::before {
-  left: 100%;
+  transition: all 0.15s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
 .api-config-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(79, 70, 229, 0.4);
+  background: #1976d2;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .api-badge {
   background: rgba(255, 255, 255, 0.2);
-  padding: 0.25rem 0.5rem;
-  border-radius: 6px;
+  padding: 0.125rem 0.375rem;
+  border-radius: 4px;
   font-size: 0.75rem;
-  font-weight: 700;
+  font-weight: 600;
 }
 
-/* 状态指示器 */
+/* 状态指示器 - 简洁设计 */
 .status-indicator {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.5rem 1rem;
-  background: rgba(255, 255, 255, 0.9);
-  border-radius: 8px;
+  padding: 0.375rem 0.75rem;
+  background: #f7f6f3;
+  border: 1px solid #e9e9e7;
+  border-radius: 6px;
   font-size: 0.875rem;
-  font-weight: 500;
+  color: #787774;
 }
 
 .status-dot {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
-  animation: pulse 2s infinite;
 }
 
-.status-connected { background: #10b981; }
-.status-error { background: #ef4444; }
-.status-checking { background: #f59e0b; }
-
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
-}
+.status-connected { background: #0f7b0f; }
+.status-error { background: #e03e3e; }
+.status-checking { background: #f5b800; }
 
 /* 主要内容区域 */
 .main-content {
@@ -196,110 +154,90 @@ body {
   align-items: start;
 }
 
-/* 现代卡片设计 */
+/* Notion风格卡片 */
 .card {
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(20px);
-  border-radius: 20px;
-  padding: 2rem;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background: white;
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px rgba(15, 15, 15, 0.1);
+  border: 1px solid #e9e9e7;
+  transition: all 0.15s ease;
 }
 
 .card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 2px 8px rgba(15, 15, 15, 0.15);
+  transform: translateY(-1px);
 }
 
 .card-title {
-  font-size: 1.5rem;
-  font-weight: 700;
-  margin-bottom: 1.5rem;
-  color: #1a202c;
-  background: linear-gradient(135deg, #667eea, #764ba2);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: #37352f;
 }
 
-/* 表单样式 */
+/* 表单样式 - Notion简洁风格 */
 .form-group {
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
 }
 
 .form-label {
   display: block;
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: #374151;
-  margin-bottom: 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #37352f;
+  margin-bottom: 0.5rem;
 }
 
 .form-select, .form-textarea {
   width: 100%;
-  padding: 1rem;
-  border: 2px solid #e2e8f0;
-  border-radius: 12px;
-  font-size: 0.9rem;
-  background: rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(10px);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  padding: 0.75rem;
+  border: 1px solid #e9e9e7;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  background: white;
+  color: #37352f;
+  transition: all 0.15s ease;
 }
 
 .form-select:focus, .form-textarea:focus {
   outline: none;
-  border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-  transform: translateY(-1px);
+  border-color: #2383e2;
+  box-shadow: 0 0 0 2px rgba(35, 131, 226, 0.1);
 }
 
 .form-textarea {
   resize: vertical;
   min-height: 200px;
   font-family: inherit;
+  line-height: 1.5;
 }
 
-/* 现代按钮组 */
+/* 按钮组 */
 .btn-group {
   display: flex;
-  gap: 1rem;
-  margin-top: 1.5rem;
+  gap: 0.75rem;
+  margin-top: 1rem;
 }
 
 .btn-primary {
   flex: 1;
-  padding: 1rem 2rem;
-  background: linear-gradient(135deg, #667eea, #764ba2);
+  padding: 0.75rem 1.5rem;
+  background: #2383e2;
   color: white;
   border: none;
-  border-radius: 12px;
-  font-size: 1rem;
-  font-weight: 600;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 500;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  position: relative;
-  overflow: hidden;
-}
-
-.btn-primary::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-  transition: left 0.5s;
-}
-
-.btn-primary:hover::before {
-  left: 100%;
+  transition: all 0.15s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
 .btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+  background: #1976d2;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transform: translateY(-1px);
 }
 
 .btn-primary:disabled {
@@ -309,36 +247,36 @@ body {
 }
 
 .btn-secondary {
-  padding: 1rem 2rem;
-  background: rgba(255, 255, 255, 0.9);
-  color: #374151;
-  border: 2px solid #e2e8f0;
-  border-radius: 12px;
-  font-size: 1rem;
-  font-weight: 600;
+  padding: 0.75rem 1.5rem;
+  background: white;
+  color: #37352f;
+  border: 1px solid #e9e9e7;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 500;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.15s ease;
 }
 
 .btn-secondary:hover {
-  background: white;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  background: #f7f6f3;
+  border-color: #d9d9d6;
 }
 
-/* 使用说明样式 */
+/* 使用说明样式 - 温和的背景色 */
 .usage-guide {
-  background: linear-gradient(135deg, #e0e7ff, #c7d2fe);
-  border-radius: 16px;
-  padding: 1.5rem;
+  background: #f7f6f3;
+  border-radius: 8px;
+  padding: 1rem;
   margin-top: 1rem;
+  border-left: 3px solid #2383e2;
 }
 
 .usage-guide h3 {
-  color: #3730a3;
-  font-size: 1.1rem;
-  font-weight: 700;
-  margin-bottom: 1rem;
+  color: #37352f;
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
 }
 
 .usage-guide ul {
@@ -349,14 +287,16 @@ body {
 .usage-guide li {
   display: flex;
   align-items: flex-start;
-  gap: 0.75rem;
-  margin-bottom: 0.75rem;
-  color: #4338ca;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+  color: #787774;
+  font-size: 0.875rem;
 }
 
 .usage-guide li::before {
-  content: '✨';
-  font-size: 1rem;
+  content: '•';
+  color: #2383e2;
+  font-weight: bold;
   margin-top: 0.125rem;
 }
 
@@ -368,74 +308,68 @@ body {
   justify-content: center;
   text-align: center;
   min-height: 400px;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(248, 250, 252, 0.95));
-  backdrop-filter: blur(20px);
-  border-radius: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: #f7f6f3;
+  border-radius: 8px;
+  border: 1px solid #e9e9e7;
+  padding: 2rem;
 }
 
 .getting-started h2 {
-  font-size: 1.75rem;
-  font-weight: 700;
-  color: #1a202c;
-  margin-bottom: 1rem;
-  background: linear-gradient(135deg, #667eea, #764ba2);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #37352f;
+  margin-bottom: 0.75rem;
 }
 
 .getting-started p {
-  color: #64748b;
-  font-size: 1.1rem;
+  color: #787774;
+  font-size: 1rem;
   max-width: 300px;
-  line-height: 1.6;
+  line-height: 1.5;
 }
 
 .getting-started-icon {
-  font-size: 4rem;
-  margin-bottom: 1.5rem;
-  opacity: 0.8;
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  opacity: 0.6;
 }
 
 /* 结果区域样式 */
 .result-content {
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(20px);
-  border-radius: 20px;
-  padding: 2rem;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: white;
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px rgba(15, 15, 15, 0.1);
+  border: 1px solid #e9e9e7;
 }
 
 .result-section {
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
 }
 
 .section-title {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: #1a202c;
-  margin-bottom: 1rem;
-  padding-bottom: 0.5rem;
-  border-bottom: 2px solid #e2e8f0;
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #37352f;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.375rem;
+  border-bottom: 1px solid #e9e9e7;
 }
 
 .text-content {
-  background: #f8fafc;
-  border-radius: 12px;
-  padding: 1.5rem;
-  font-size: 0.9rem;
-  line-height: 1.7;
-  color: #374151;
-  border-left: 4px solid #667eea;
+  background: #f7f6f3;
+  border-radius: 6px;
+  padding: 1rem;
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: #37352f;
+  border-left: 3px solid #2383e2;
 }
 
-/* Footer 样式 - 精致设计 */
+/* Footer 样式 - 简洁温暖 */
 .footer {
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(20px);
-  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  background: white;
+  border-top: 1px solid #e9e9e7;
   padding: 2rem 0;
   margin-top: 4rem;
 }
@@ -452,31 +386,30 @@ body {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  font-size: 0.9rem;
-  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.875rem;
+  color: #787774;
 }
 
 .footer-link {
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
-  color: rgba(255, 255, 255, 0.9);
+  gap: 0.375rem;
+  color: #2383e2;
   text-decoration: none;
-  font-weight: 600;
-  transition: all 0.3s ease;
-  padding: 0.25rem 0.5rem;
-  border-radius: 6px;
+  font-weight: 500;
+  transition: all 0.15s ease;
+  padding: 0.125rem 0.25rem;
+  border-radius: 4px;
 }
 
 .footer-link:hover {
-  color: white;
-  background: rgba(255, 255, 255, 0.1);
+  background: #f1f1ef;
+  color: #1976d2;
 }
 
 .footer-tech {
-  font-size: 0.9rem;
-  color: rgba(255, 255, 255, 0.7);
-  font-weight: 500;
+  font-size: 0.875rem;
+  color: #787774;
 }
 
 /* 模态框样式 */
@@ -486,8 +419,7 @@ body {
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(4px);
+  background: rgba(15, 15, 15, 0.5);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -496,19 +428,21 @@ body {
 
 .modal {
   background: white;
-  border-radius: 20px;
-  padding: 2rem;
+  border-radius: 8px;
+  padding: 1.5rem;
   max-width: 500px;
   width: 90%;
   max-height: 80vh;
   overflow-y: auto;
-  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 4px 12px rgba(15, 15, 15, 0.15);
+  border: 1px solid #e9e9e7;
 }
 
 /* 响应式设计 */
 @media (max-width: 968px) {
   .main-content {
     grid-template-columns: 1fr;
+    gap: 1.5rem;
   }
 }
 
@@ -518,12 +452,12 @@ body {
   }
   
   .header {
-    padding: 1rem 0;
+    padding: 0.75rem 0;
   }
 
   .header-content {
     flex-direction: column;
-    gap: 1rem;
+    gap: 0.75rem;
     align-items: stretch;
   }
   
@@ -548,28 +482,29 @@ body {
   
   .footer-content {
     flex-direction: column;
-    gap: 1rem;
+    gap: 0.75rem;
     text-align: center;
   }
   
   .logo {
-    font-size: 1.75rem;
+    font-size: 1.375rem;
   }
   
   .card {
-    padding: 1.5rem;
+    padding: 1.25rem;
   }
   
   .getting-started {
     min-height: 300px;
+    padding: 1.5rem;
   }
 }
 
-/* 加载和动画效果 */
+/* 加载和动画效果 - 简化版 */
 .streaming-cursor {
   display: inline-block;
   animation: blink 1s infinite;
-  color: #667eea;
+  color: #2383e2;
   font-weight: bold;
 }
 
@@ -579,11 +514,11 @@ body {
 }
 
 .loading-spinner {
-  width: 20px;
-  height: 20px;
-  border: 2px solid rgba(255,255,255,0.3);
+  width: 16px;
+  height: 16px;
+  border: 2px solid #e9e9e7;
   border-radius: 50%;
-  border-top-color: white;
+  border-top-color: #2383e2;
   animation: spin 1s ease-in-out infinite;
 }
 
@@ -593,26 +528,25 @@ body {
 
 /* 提示信息样式 */
 .provider-warning {
-  color: #dc2626;
+  color: #e03e3e;
   font-size: 0.8rem;
   margin-top: 0.5rem;
   padding: 0.5rem;
-  background: #fef2f2;
+  background: #fdf2f2;
   border-radius: 6px;
-  border-left: 3px solid #dc2626;
+  border-left: 3px solid #e03e3e;
 }
 
 /* 流式输出内容样式 */
 .streaming-content {
-  position: relative;
-  background: linear-gradient(135deg, #f8fafc, #e2e8f0);
-  border-radius: 12px;
-  padding: 1.5rem;
+  background: #f7f6f3;
+  border-radius: 6px;
+  padding: 1rem;
   font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
-  font-size: 0.85rem;
-  line-height: 1.6;
-  color: #374151;
-  border-left: 4px solid #667eea;
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: #37352f;
+  border-left: 3px solid #2383e2;
   white-space: pre-wrap;
   word-break: break-word;
 }
