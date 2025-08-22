@@ -849,18 +849,42 @@ body {
   }
 }
 
-/* 美化API配置模态框 - 简化版 */
+/* 美化API配置模态框 - 修复滚动问题 */
 .modal-overlay .modal {
   border-radius: 20px !important;
-  overflow: hidden !important;
+  overflow-y: auto !important;
+  max-height: 90vh !important;
   box-shadow: 
     0 25px 50px -12px rgba(0, 0, 0, 0.25),
     0 0 0 1px rgba(255, 255, 255, 0.05) !important;
 }
 
+/* 确保滚动条可见 */
+.modal-overlay .modal::-webkit-scrollbar {
+  width: 8px !important;
+  display: block !important;
+}
+
+.modal-overlay .modal::-webkit-scrollbar-track {
+  background: rgba(241, 240, 238, 0.5) !important;
+  border-radius: 4px !important;
+}
+
+.modal-overlay .modal::-webkit-scrollbar-thumb {
+  background: rgba(155, 154, 151, 0.6) !important;
+  border-radius: 4px !important;
+}
+
+.modal-overlay .modal::-webkit-scrollbar-thumb:hover {
+  background: rgba(155, 154, 151, 0.8) !important;
+}
+
 .modal-overlay .modal-header {
   background: linear-gradient(135deg, #fbfbfa 0%, #f8f8f7 100%) !important;
   padding: 2rem !important;
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 10 !important;
 }
 
 .modal-overlay .modal-title {
@@ -873,6 +897,7 @@ body {
   background: linear-gradient(135deg, #ffffff 0%, #fefefe 100%) !important;
   border-radius: 16px !important;
   padding: 2rem !important;
+  margin-bottom: 1.25rem !important;
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 
@@ -902,4 +927,10 @@ body {
 
 .modal-overlay .btn-primary:hover {
   transform: translateY(-2px) scale(1.02) !important;
+}
+
+/* 确保内容区域可以滚动 */
+.modal-overlay .modal > div:not(.modal-header) {
+  padding: 0 2.5rem 2.5rem 2.5rem !important;
+  overflow: visible !important;
 }
