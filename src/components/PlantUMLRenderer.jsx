@@ -1,7 +1,7 @@
 import plantumlEncoder from 'plantuml-encoder';
 import React, { useState, useEffect } from 'react';
 
-// 本地PlantUML渲染器，使用后端代理
+// 纯前端PlantUML渲染器，直接使用外部服务
 const PlantUMLViewer = ({ code, onCodeChange }) => {
   const [svgContent, setSvgContent] = useState('');
   const [loading, setLoading] = useState(true);
@@ -18,21 +18,50 @@ const PlantUMLViewer = ({ code, onCodeChange }) => {
       setLoading(true);
       setError(null);
 
-      // 使用本地API端点渲染PlantUML
-      const response = await fetch('http://localhost:3001/api/plantuml/render', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ code: umlCode })
-      });
+      // 编码PlantUML代码
+      const encoded = plantumlEncoder.encode(umlCode);
+      
+      // 尝试多个PlantUML服务器，优先使用本地服务器
+      const plantUMLServers = [
+        `http://localhost:8080/svg/${encoded}`, // 本地Docker PlantUML服务器
+        `https://plantuml-server.kkeisuke.dev/svg/${encoded}`,
+        `https://www.plantuml.com/plantuml/svg/${encoded}`,
+      ];
+      
+      let lastError = null;
+      
+      for (const plantUMLUrl of plantUMLServers) {
+        try {
+          console.log(`尝试PlantUML服务器: ${plantUMLUrl}`);
+          
+          const response = await fetch(plantUMLUrl, {
+            method: 'GET',
+            signal: AbortSignal.timeout(30000) // 30秒超时
+          });
 
-      if (!response.ok) {
-        throw new Error(`渲染失败: ${response.status}`);
+          if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+          }
+
+          const svgData = await response.text();
+          
+          // 验证返回的是否为有效SVG
+          if (svgData && svgData.includes('<svg')) {
+            setSvgContent(svgData);
+            return; // 成功渲染，退出循环
+          } else {
+            throw new Error('返回的内容不是有效的SVG格式');
+          }
+        } catch (serverError) {
+          console.warn(`PlantUML服务器 ${plantUMLUrl} 失败:`, serverError);
+          lastError = serverError;
+          continue; // 尝试下一个服务器
+        }
       }
-
-      const svgData = await response.text();
-      setSvgContent(svgData);
+      
+      // 所有服务器都失败了
+      throw lastError || new Error('所有PlantUML服务器都无法访问');
+      
     } catch (err) {
       console.error('PlantUML渲染错误:', err);
       setError(err.message);
@@ -119,7 +148,7 @@ const PlantUMLViewer = ({ code, onCodeChange }) => {
   }
 
   if (error) {
-    // 出错时回退到外部链接方案
+    // 出错时提供外部链接方案
     try {
       const encoded = plantumlEncoder.encode(code);
       const svgUrl = `https://www.plantuml.com/plantuml/svg/${encoded}`;
@@ -128,7 +157,7 @@ const PlantUMLViewer = ({ code, onCodeChange }) => {
       
       return (
         <div className="plantuml-error">
-          <p className="error-message">本地渲染失败: {error}</p>
+          <p className="error-message">渲染失败: {error}</p>
           <p className="fallback-message">使用外部服务作为备选方案：</p>
           <div className="action-buttons">
             <a href={svgUrl} target="_blank" rel="noopener noreferrer" className="btn btn-primary">

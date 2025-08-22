@@ -848,3 +848,58 @@ body {
     padding: 1rem;
   }
 }
+
+/* 美化API配置模态框 - 简化版 */
+.modal-overlay .modal {
+  border-radius: 20px !important;
+  overflow: hidden !important;
+  box-shadow: 
+    0 25px 50px -12px rgba(0, 0, 0, 0.25),
+    0 0 0 1px rgba(255, 255, 255, 0.05) !important;
+}
+
+.modal-overlay .modal-header {
+  background: linear-gradient(135deg, #fbfbfa 0%, #f8f8f7 100%) !important;
+  padding: 2rem !important;
+}
+
+.modal-overlay .modal-title {
+  font-size: 1.375rem !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.025em !important;
+}
+
+.modal-overlay .api-provider {
+  background: linear-gradient(135deg, #ffffff 0%, #fefefe 100%) !important;
+  border-radius: 16px !important;
+  padding: 2rem !important;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.modal-overlay .api-provider:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1) !important;
+}
+
+.modal-overlay .api-input,
+.modal-overlay .model-select {
+  border-radius: 12px !important;
+  padding: 1rem !important;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.modal-overlay .api-input:focus,
+.modal-overlay .model-select:focus {
+  transform: translateY(-1px) !important;
+  box-shadow: 0 0 0 4px rgba(35, 131, 226, 0.1) !important;
+}
+
+.modal-overlay .btn-primary {
+  background: linear-gradient(135deg, #2383e2 0%, #1976d2 100%) !important;
+  border-radius: 12px !important;
+  padding: 1rem 2rem !important;
+}
+
+.modal-overlay .btn-primary:hover {
+  transform: translateY(-2px) scale(1.02) !important;
+}

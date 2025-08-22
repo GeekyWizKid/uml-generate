@@ -7,7 +7,7 @@ const AI_PROVIDERS = {
       'Content-Type': 'application/json'
     }),
     formatRequest: (prompt, stream = false) => ({
-      model: 'gpt-4',
+      model: 'gpt-4o',
       messages: [{ role: 'user', content: prompt }],
       temperature: 0.7,
       stream
@@ -24,7 +24,7 @@ const AI_PROVIDERS = {
       'anthropic-version': '2023-06-01'
     }),
     formatRequest: (prompt, stream = false) => ({
-      model: 'claude-3-sonnet-20240229',
+      model: 'claude-3-5-sonnet-20241022',
       max_tokens: 4000,
       messages: [{ role: 'user', content: prompt }],
       stream
@@ -55,7 +55,7 @@ const AI_PROVIDERS = {
       'Content-Type': 'application/json'
     }),
     formatRequest: (prompt, stream = false) => ({
-      model: 'moonshot-v1-8k',
+      model: 'moonshot-v1-32k',
       messages: [{ role: 'user', content: prompt }],
       temperature: 0.3,
       stream
@@ -63,6 +63,43 @@ const AI_PROVIDERS = {
     extractResponse: (data) => data.choices[0].message.content,
     keyName: 'kimi',
     supportsStream: true
+  },
+  gemini: {
+    url: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent',
+    getHeaders: (apiKey) => ({
+      'Content-Type': 'application/json'
+    }),
+    formatRequest: (prompt, stream = false) => ({
+      contents: [{ parts: [{ text: prompt }] }],
+      generationConfig: {
+        temperature: 0.7,
+        maxOutputTokens: 4000
+      }
+    }),
+    extractResponse: (data) => data.candidates[0].content.parts[0].text,
+    keyName: 'gemini',
+    supportsStream: false,
+    customUrl: (apiKey) => `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=${apiKey}`
+  },
+  qwen: {
+    url: 'https://dashscope.aliyuncs.com/api/v1/services/aigc/text-generation/generation',
+    getHeaders: (apiKey) => ({
+      'Authorization': `Bearer ${apiKey}`,
+      'Content-Type': 'application/json'
+    }),
+    formatRequest: (prompt, stream = false) => ({
+      model: 'qwen-plus',
+      input: {
+        messages: [{ role: 'user', content: prompt }]
+      },
+      parameters: {
+        temperature: 0.7,
+        max_tokens: 4000
+      }
+    }),
+    extractResponse: (data) => data.output.choices[0].message.content,
+    keyName: 'qwen',
+    supportsStream: false
   }
 };
 
@@ -127,10 +164,10 @@ ${materials}
 请根据以上素材生成 UML 图。`;
 };
 
-// 获取保存的API密钥
+// 获取保存的API密钥和模型配置
 const getStoredApiKeys = () => {
   const apiKeys = {};
-  const providers = ['openai', 'claude', 'deepseek', 'kimi'];
+  const providers = ['openai', 'claude', 'deepseek', 'kimi', 'gemini', 'qwen'];
   
   providers.forEach(provider => {
     const key = localStorage.getItem(`api_key_${provider}`);
@@ -142,9 +179,24 @@ const getStoredApiKeys = () => {
   return apiKeys;
 };
 
+const getStoredModels = () => {
+  const models = {};
+  const providers = ['openai', 'claude', 'deepseek', 'kimi', 'gemini', 'qwen'];
+  
+  providers.forEach(provider => {
+    const model = localStorage.getItem(`model_${provider}`);
+    if (model) {
+      models[provider] = model;
+    }
+  });
+  
+  return models;
+};
+
 export const generateUML = async (materials, provider = 'chatgpt') => {
   try {
     const apiKeys = getStoredApiKeys();
+    const models = getStoredModels();
     const aiProvider = AI_PROVIDERS[provider];
     
     if (!aiProvider) {
@@ -159,10 +211,20 @@ export const generateUML = async (materials, provider = 'chatgpt') => {
     }
     
     const prompt = buildUMLPrompt(materials);
-    const requestData = aiProvider.formatRequest(prompt, false);
+    
+    // 使用用户自定义模型或默认模型
+    const selectedModel = models[provider] || aiProvider.formatRequest('', false).model;
+    const requestData = {
+      ...aiProvider.formatRequest(prompt, false),
+      model: selectedModel
+    };
+    
     const headers = aiProvider.getHeaders(apiKey);
     
-    const response = await fetch(aiProvider.url, {
+    // 处理特殊的URL格式（如Gemini）
+    const requestUrl = aiProvider.customUrl ? aiProvider.customUrl(apiKey) : aiProvider.url;
+    
+    const response = await fetch(requestUrl, {
       method: 'POST',
       headers,
       body: JSON.stringify(requestData),
@@ -191,6 +253,7 @@ export const generateUML = async (materials, provider = 'chatgpt') => {
 export const generateUMLStream = async (materials, provider = 'chatgpt', onProgress) => {
   try {
     const apiKeys = getStoredApiKeys();
+    const models = getStoredModels();
     const aiProvider = AI_PROVIDERS[provider];
     
     if (!aiProvider) {
@@ -205,10 +268,20 @@ export const generateUMLStream = async (materials, provider = 'chatgpt', onProgr
     }
     
     const prompt = buildUMLPrompt(materials);
-    const requestData = aiProvider.formatRequest(prompt, true); // 启用流式
+    
+    // 使用用户自定义模型或默认模型
+    const selectedModel = models[provider] || aiProvider.formatRequest('', true).model;
+    const requestData = {
+      ...aiProvider.formatRequest(prompt, true), // 启用流式
+      model: selectedModel
+    };
+    
     const headers = aiProvider.getHeaders(apiKey);
     
-    const response = await fetch(aiProvider.url, {
+    // 处理特殊的URL格式（如Gemini）
+    const requestUrl = aiProvider.customUrl ? aiProvider.customUrl(apiKey) : aiProvider.url;
+    
+    const response = await fetch(requestUrl, {
       method: 'POST',
       headers,
       body: JSON.stringify(requestData),
@@ -305,7 +378,7 @@ export const checkHealth = async () => {
 // 检查配置状态
 export const checkApiKeyStatus = () => {
   const apiKeys = getStoredApiKeys();
-  const providers = ['openai', 'claude', 'deepseek', 'kimi'];
+  const providers = ['openai', 'claude', 'deepseek', 'kimi', 'gemini', 'qwen'];
   
   return {
     configured: Object.keys(apiKeys).length,

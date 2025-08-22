@@ -10,13 +10,14 @@
 
 ## 功能特性
 
-- 🤖 **多AI支持**: 集成ChatGPT、Claude、DeepSeek、Kimi四个主流AI服务
+- 🤖 **多AI支持**: 集成ChatGPT、Claude、DeepSeek、Kimi、Gemini、通义千问六个主流AI服务
 - 📊 **多种图表**: 自动生成交互图(顺序图)、活动图、状态图
-- 🎨 **可视化渲染**: 使用PlantUML在线服务渲染图表
-- 💻 **现代界面**: 基于React的响应式纯CSS设计
+- 🎨 **可视化渲染**: 支持本地Docker PlantUML服务器 + 在线服务备选方案
+- 💻 **现代界面**: 基于React的响应式Notion风格设计
 - ⚡ **流式输出**: 实时显示生成过程，避免超时问题
 - 🛡️ **隐私保护**: API密钥存储在本地浏览器，不经过服务器
 - 🚀 **纯前端**: 无需部署后端服务器，直接部署到静态托管
+- ⚙️ **模型自定义**: 支持为每个AI服务商自定义选择模型版本
 
 ## 技术栈
 
@@ -37,9 +38,8 @@ git clone <repository-url>
 cd uml-generate
 ```
 
-### 2. 安装前端依赖
+### 2. 安装依赖
 ```bash
-cd client
 npm install
 ```
 
@@ -48,12 +48,25 @@ npm install
 npm run dev
 ```
 
-### 4. 配置API密钥
+### 4. (可选) 启动本地PlantUML服务器
+为了获得最佳的图表渲染性能，建议启动本地PlantUML Docker服务器：
+
+```bash
+# 启动本地PlantUML服务器
+./start-plantuml.sh
+
+# 停止服务器
+./stop-plantuml.sh
+```
+
+**注意**: 如果没有启动本地服务器，系统会自动使用在线PlantUML服务作为备选方案。
+
+### 5. 配置API密钥
 在浏览器中打开 http://localhost:5173，点击右上角的"API配置"按钮，添加至少一个AI服务的API密钥。
 
 **注意**: API密钥仅存储在您的浏览器本地localStorage中，不会发送到任何服务器。
 
-### 5. 开始使用
+### 6. 开始使用
 输入项目需求描述，选择AI服务商，点击"生成UML图"即可。
 
 ## API密钥获取
@@ -75,6 +88,16 @@ npm run dev
 
 ### Kimi (月之暗面)
 1. 访问 [Moonshot AI](https://platform.moonshot.cn/)
+2. 注册/登录账户
+3. 创建API密钥
+
+### Google Gemini
+1. 访问 [Google AI Studio](https://aistudio.google.com/)
+2. 注册/登录账户
+3. 创建API密钥
+
+### 通义千问 (阿里云)
+1. 访问 [阿里云百炼](https://dashscope.aliyuncs.com/)
 2. 注册/登录账户
 3. 创建API密钥
 
@@ -101,12 +124,11 @@ npm run dev
 
 ### 构建生产版本
 ```bash
-cd client
 npm run build
 ```
 
 ### 部署到静态托管
-将 `client/dist/` 目录上传到任何静态文件托管服务：
+将 `dist/` 目录上传到任何静态文件托管服务：
 
 - **Vercel**: 零配置部署React应用
 - **Netlify**: 拖拽部署或Git集成
@@ -135,31 +157,53 @@ VITE_PLANTUML_SERVER=https://www.plantuml.com/plantuml
 ## 项目结构
 
 ```
-uml-generate/
-├── client/                 # React前端应用 (纯前端架构)
-│   ├── src/
-│   │   ├── components/     # React组件
-│   │   │   ├── ApiKeyModal.jsx      # API密钥配置弹窗
-│   │   │   └── PlantUMLRenderer.jsx # UML图表渲染器
-│   │   ├── services/       # API服务
-│   │   │   └── api.js               # 直接调用AI API服务
-│   │   ├── App.jsx         # 主应用组件
-│   │   ├── index.css       # 纯CSS样式系统
-│   │   └── main.jsx        # 应用入口
-│   ├── package.json
-│   └── dist/              # 构建产物(部署用)
-├── ~~server/~~            # 已移除的后端服务
-├── package.json           # 根项目配置
-├── CLAUDE.md             # Claude Code项目指引  
-└── README.md             # 项目说明
+uml-generate/                   # 标准Vite项目结构
+├── src/                        # React前端应用源码
+│   ├── components/             # React组件
+│   │   ├── ApiKeyModal.jsx     # API密钥配置弹窗(支持6个AI服务商)
+│   │   └── PlantUMLRenderer.jsx# PlantUML图表渲染器(Docker优先+在线备选)
+│   ├── services/               # API服务
+│   │   └── api.js              # 直接调用AI API服务(支持自定义模型)
+│   ├── App.jsx                 # 主应用组件
+│   ├── index.css               # Notion风格CSS样式系统
+│   └── main.jsx                # 应用入口
+├── public/                     # 静态资源
+├── dist/                       # 构建产物(部署用)
+├── start-plantuml.sh          # 启动本地PlantUML Docker服务器脚本
+├── stop-plantuml.sh           # 停止PlantUML服务器脚本
+├── package.json               # 项目依赖和配置
+├── vite.config.js             # Vite配置文件
+├── vercel.json                # Vercel部署配置
+└── README.md                  # 项目说明
 ```
+
+## PlantUML服务器配置
+
+### 本地Docker服务器（推荐）
+为了获得最佳性能和稳定性，推荐使用本地PlantUML Docker服务器：
+
+```bash
+# 启动服务器（在8080端口）
+./start-plantuml.sh
+
+# 检查服务器状态
+curl http://localhost:8080/plantuml/
+
+# 停止服务器
+./stop-plantuml.sh
+```
+
+### 自动备选机制
+系统会按以下优先级尝试PlantUML服务器：
+1. 🔵 **本地Docker服务器** (http://localhost:8080) - 最快、最稳定
+2. 🟢 **第三方备选服务器** (plantuml-server.kkeisuke.dev) - 较快
+3. 🟡 **官方服务器** (www.plantuml.com) - 作为最后备选
+
+如果本地服务器不可用，系统会自动切换到在线服务。
 
 ## 开发脚本
 
 ```bash
-# 进入前端目录
-cd client
-
 # 开发模式
 npm run dev
 
@@ -168,6 +212,12 @@ npm run build
 
 # 预览生产构建
 npm run preview
+
+# 启动本地PlantUML服务器
+./start-plantuml.sh
+
+# 停止PlantUML服务器
+./stop-plantuml.sh
 ```
 
 ## 故障排除
@@ -190,8 +240,16 @@ npm run preview
 - 生产环境可考虑配置反向代理
 
 ### PlantUML图表无法显示  
-- 检查网络连接，确保能访问 plantuml.com
-- 可以配置私有PlantUML服务器地址
+
+**本地Docker服务器问题**:
+- 确保Docker已安装并运行
+- 检查8080端口是否被占用: `lsof -i :8080`
+- 重启PlantUML服务器: `./stop-plantuml.sh && ./start-plantuml.sh`
+
+**网络连接问题**:
+- 检查网络连接，确保能访问在线PlantUML服务器
+- 如果在国内，某些服务器可能需要科学上网
+- 可以尝试切换到其他PlantUML在线服务
 
 ## 技术说明
 
