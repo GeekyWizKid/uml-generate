@@ -3,38 +3,33 @@
   "builds": [
     {
       "src": "server/index.js",
-      "use": "@vercel/node",
-      "config": {
-        "maxDuration": 30
-      }
+      "use": "@vercel/node"
     },
     {
-      "src": "client/package.json",
-      "use": "@vercel/static-build",
-      "config": {
-        "distDir": "dist"
-      }
+      "src": "index.html",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "client/dist/**",
+      "use": "@vercel/static"
     }
   ],
   "routes": [
     {
       "src": "/api/(.*)",
-      "dest": "server/index.js"
+      "dest": "/server/index.js"
     },
     {
-      "src": "/assets/(.*)",
-      "dest": "client/dist/assets/$1"
+      "src": "/app",
+      "dest": "/client/dist/index.html"
     },
     {
-      "src": "/vite.svg",
-      "dest": "client/dist/vite.svg"
+      "src": "/client/dist/(.*)",
+      "dest": "/client/dist/$1"
     },
     {
-      "src": "/(.*)",
-      "dest": "client/dist/index.html"
+      "src": "/",
+      "dest": "/index.html"
     }
-  ],
-  "env": {
-    "NODE_ENV": "production"
-  }
+  ]
 }
