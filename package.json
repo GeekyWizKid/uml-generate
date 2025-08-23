@@ -11,9 +11,17 @@
     "preview": "vite preview",
     "vercel-build": "npm run build"
   },
-  "keywords": ["uml", "diagram", "plantuml", "ai", "generation", "react", "vite"],
+  "keywords": [
+    "uml",
+    "diagram",
+    "plantuml",
+    "ai",
+    "generation",
+    "react",
+    "vite"
+  ],
   "author": {
-    "name": "GeekyWizKid", 
+    "name": "GeekyWizKid",
     "url": "https://github.com/GeekyWizKid"
   },
   "homepage": "https://github.com/GeekyWizKid/uml-generate#readme",
@@ -32,6 +40,8 @@
   "dependencies": {
     "@headlessui/react": "^2.2.7",
     "@heroicons/react": "^2.2.0",
+    "@vercel/analytics": "^1.5.0",
+    "@vercel/speed-insights": "^1.2.0",
     "plantuml-encoder": "^1.4.0",
     "plantuml-js": "^0.0.2",
     "react": "^19.1.1",

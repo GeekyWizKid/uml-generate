@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { track } from '@vercel/analytics';
 
 const API_PROVIDERS = [
   { 
@@ -121,6 +122,17 @@ export const ApiKeyModal = ({ isOpen, onClose, onSave }) => {
         localStorage.setItem(`model_${providerId}`, model);
       }
     });
+
+    // 追踪API密钥配置事件
+    try {
+      track('api_keys_configured', {
+        configured_providers: Object.keys(apiKeys).length,
+        providers: Object.keys(apiKeys),
+        total_providers: API_PROVIDERS.length
+      });
+    } catch (trackError) {
+      console.log('Analytics tracking failed:', trackError);
+    }
 
     // 通知父组件
     onSave({ apiKeys, models });

@@ -1,3 +1,5 @@
+import { track } from '@vercel/analytics';
+
 // AI服务配置
 const AI_PROVIDERS = {
   chatgpt: {
@@ -239,6 +241,19 @@ export const generateUML = async (materials, provider = 'chatgpt') => {
     const data = await response.json();
     const generatedContent = aiProvider.extractResponse(data);
     
+    // 追踪UML生成成功事件
+    try {
+      track('uml_generated', {
+        provider,
+        model: selectedModel,
+        content_length: materials.length,
+        response_length: generatedContent.length
+      });
+    } catch (trackError) {
+      // 忽略追踪错误，不影响主要功能
+      console.log('Analytics tracking failed:', trackError);
+    }
+    
     return {
       success: true,
       provider,
@@ -246,6 +261,16 @@ export const generateUML = async (materials, provider = 'chatgpt') => {
       timestamp: new Date().toISOString()
     };
   } catch (error) {
+    // 追踪UML生成失败事件
+    try {
+      track('uml_generation_failed', {
+        provider,
+        error: error.message
+      });
+    } catch (trackError) {
+      console.log('Analytics tracking failed:', trackError);
+    }
+    
     throw new Error(error.message || '生成UML图时发生错误');
   }
 };

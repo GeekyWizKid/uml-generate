@@ -1,5 +1,6 @@
 import plantumlEncoder from 'plantuml-encoder';
 import React, { useState, useEffect } from 'react';
+import { track } from '@vercel/analytics';
 
 // 纯前端PlantUML渲染器，直接使用外部服务
 const PlantUMLViewer = ({ code, onCodeChange }) => {
@@ -111,6 +112,16 @@ const PlantUMLViewer = ({ code, onCodeChange }) => {
           a.click();
           document.body.removeChild(a);
           URL.revokeObjectURL(url);
+          // 追踪PNG下载事件
+          try {
+            track('plantuml_png_downloaded', { 
+              canvas_width: canvas.width, 
+              canvas_height: canvas.height,
+              file_size: blob.size 
+            });
+          } catch (trackError) {
+            console.log('Analytics tracking failed:', trackError);
+          }
         }, 'image/png');
         
         URL.revokeObjectURL(svgUrl);
@@ -197,6 +208,12 @@ const PlantUMLViewer = ({ code, onCodeChange }) => {
           onClick={() => {
             navigator.clipboard.writeText(code);
             alert('PlantUML代码已复制到剪贴板！');
+            // 追踪代码复制事件
+            try {
+              track('plantuml_code_copied', { code_length: code.length });
+            } catch (trackError) {
+              console.log('Analytics tracking failed:', trackError);
+            }
           }}
           className="btn btn-secondary"
         >
@@ -214,6 +231,12 @@ const PlantUMLViewer = ({ code, onCodeChange }) => {
             a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
+            // 追踪SVG下载事件
+            try {
+              track('plantuml_svg_downloaded', { file_size: svgContent.length });
+            } catch (trackError) {
+              console.log('Analytics tracking failed:', trackError);
+            }
           }}
           className="btn btn-info"
         >
