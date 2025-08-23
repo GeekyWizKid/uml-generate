@@ -102,6 +102,22 @@ const AI_PROVIDERS = {
     extractResponse: (data) => data.output.choices[0].message.content,
     keyName: 'qwen',
     supportsStream: false
+  },
+  custom: {
+    url: '', // 将被自定义URL覆盖
+    getHeaders: (apiKey) => ({
+      'Authorization': `Bearer ${apiKey}`,
+      'Content-Type': 'application/json'
+    }),
+    formatRequest: (prompt, stream = false) => ({
+      model: 'custom-model', // 将被自定义模型覆盖
+      messages: [{ role: 'user', content: prompt }],
+      temperature: 0.7,
+      stream
+    }),
+    extractResponse: (data) => data.choices[0].message.content,
+    keyName: 'custom',
+    supportsStream: true
   }
 };
 
@@ -169,7 +185,7 @@ ${materials}
 // 获取保存的API密钥和模型配置
 const getStoredApiKeys = () => {
   const apiKeys = {};
-  const providers = ['openai', 'claude', 'deepseek', 'kimi', 'gemini', 'qwen'];
+  const providers = ['openai', 'claude', 'deepseek', 'kimi', 'gemini', 'qwen', 'custom'];
   
   providers.forEach(provider => {
     const key = localStorage.getItem(`api_key_${provider}`);
@@ -183,7 +199,7 @@ const getStoredApiKeys = () => {
 
 const getStoredModels = () => {
   const models = {};
-  const providers = ['openai', 'claude', 'deepseek', 'kimi', 'gemini', 'qwen'];
+  const providers = ['openai', 'claude', 'deepseek', 'kimi', 'gemini', 'qwen', 'custom'];
   
   providers.forEach(provider => {
     const model = localStorage.getItem(`model_${provider}`);
@@ -215,16 +231,29 @@ export const generateUML = async (materials, provider = 'chatgpt') => {
     const prompt = buildUMLPrompt(materials);
     
     // 使用用户自定义模型或默认模型
-    const selectedModel = models[provider] || aiProvider.formatRequest('', false).model;
+    let selectedModel = models[provider] || aiProvider.formatRequest('', false).model;
+    let requestUrl = aiProvider.customUrl ? aiProvider.customUrl(apiKey) : aiProvider.url;
+    
+    // 处理自定义提供商的URL和模型
+    if (provider === 'custom') {
+      const customUrl = localStorage.getItem('custom_url_custom');
+      const customModel = localStorage.getItem('custom_model_custom');
+      
+      if (customUrl && customUrl.trim()) {
+        requestUrl = customUrl.trim();
+      }
+      
+      if (customModel && customModel.trim()) {
+        selectedModel = customModel.trim();
+      }
+    }
+    
     const requestData = {
       ...aiProvider.formatRequest(prompt, false),
       model: selectedModel
     };
     
     const headers = aiProvider.getHeaders(apiKey);
-    
-    // 处理特殊的URL格式（如Gemini）
-    const requestUrl = aiProvider.customUrl ? aiProvider.customUrl(apiKey) : aiProvider.url;
     
     const response = await fetch(requestUrl, {
       method: 'POST',
@@ -295,16 +324,29 @@ export const generateUMLStream = async (materials, provider = 'chatgpt', onProgr
     const prompt = buildUMLPrompt(materials);
     
     // 使用用户自定义模型或默认模型
-    const selectedModel = models[provider] || aiProvider.formatRequest('', true).model;
+    let selectedModel = models[provider] || aiProvider.formatRequest('', true).model;
+    let requestUrl = aiProvider.customUrl ? aiProvider.customUrl(apiKey) : aiProvider.url;
+    
+    // 处理自定义提供商的URL和模型
+    if (provider === 'custom') {
+      const customUrl = localStorage.getItem('custom_url_custom');
+      const customModel = localStorage.getItem('custom_model_custom');
+      
+      if (customUrl && customUrl.trim()) {
+        requestUrl = customUrl.trim();
+      }
+      
+      if (customModel && customModel.trim()) {
+        selectedModel = customModel.trim();
+      }
+    }
+    
     const requestData = {
       ...aiProvider.formatRequest(prompt, true), // 启用流式
       model: selectedModel
     };
     
     const headers = aiProvider.getHeaders(apiKey);
-    
-    // 处理特殊的URL格式（如Gemini）
-    const requestUrl = aiProvider.customUrl ? aiProvider.customUrl(apiKey) : aiProvider.url;
     
     const response = await fetch(requestUrl, {
       method: 'POST',
@@ -403,7 +445,7 @@ export const checkHealth = async () => {
 // 检查配置状态
 export const checkApiKeyStatus = () => {
   const apiKeys = getStoredApiKeys();
-  const providers = ['openai', 'claude', 'deepseek', 'kimi', 'gemini', 'qwen'];
+  const providers = ['openai', 'claude', 'deepseek', 'kimi', 'gemini', 'qwen', 'custom'];
   
   return {
     configured: Object.keys(apiKeys).length,

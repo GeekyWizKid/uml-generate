@@ -55,12 +55,24 @@ const API_PROVIDERS = [
     description: '用于通义千问模型的API密钥',
     defaultModel: 'qwen-plus',
     availableModels: ['qwen-plus', 'qwen-turbo', 'qwen-max']
+  },
+  { 
+    id: 'custom', 
+    name: '🔧 自定义服务', 
+    key: 'CUSTOM_API_KEY',
+    placeholder: 'your-api-key (可选)',
+    description: '自定义模型服务 (支持OpenAI兼容API)',
+    defaultModel: 'custom-model',
+    availableModels: ['custom-model'],
+    isCustom: true
   }
 ];
 
 export const ApiKeyModal = ({ isOpen, onClose, onSave }) => {
   const [apiKeys, setApiKeys] = useState({});
   const [models, setModels] = useState({});
+  const [customUrls, setCustomUrls] = useState({});
+  const [customModels, setCustomModels] = useState({});
   const [showKeys, setShowKeys] = useState({});
   const [hasChanges, setHasChanges] = useState(false);
 
@@ -69,16 +81,31 @@ export const ApiKeyModal = ({ isOpen, onClose, onSave }) => {
       // 从localStorage加载已保存的API密钥和模型配置
       const savedKeys = {};
       const savedModels = {};
+      const savedUrls = {};
+      const savedCustomModels = {};
+      
       API_PROVIDERS.forEach(provider => {
         const savedKey = localStorage.getItem(`api_key_${provider.id}`);
         const savedModel = localStorage.getItem(`model_${provider.id}`);
+        const savedUrl = localStorage.getItem(`custom_url_${provider.id}`);
+        const savedCustomModel = localStorage.getItem(`custom_model_${provider.id}`);
+        
         if (savedKey) {
           savedKeys[provider.id] = savedKey;
         }
         savedModels[provider.id] = savedModel || provider.defaultModel;
+        if (savedUrl) {
+          savedUrls[provider.id] = savedUrl;
+        }
+        if (savedCustomModel) {
+          savedCustomModels[provider.id] = savedCustomModel;
+        }
       });
+      
       setApiKeys(savedKeys);
       setModels(savedModels);
+      setCustomUrls(savedUrls);
+      setCustomModels(savedCustomModels);
       setHasChanges(false);
     }
   }, [isOpen]);
@@ -93,6 +120,22 @@ export const ApiKeyModal = ({ isOpen, onClose, onSave }) => {
 
   const handleModelChange = (providerId, model) => {
     setModels(prev => ({
+      ...prev,
+      [providerId]: model
+    }));
+    setHasChanges(true);
+  };
+
+  const handleCustomUrlChange = (providerId, url) => {
+    setCustomUrls(prev => ({
+      ...prev,
+      [providerId]: url
+    }));
+    setHasChanges(true);
+  };
+
+  const handleCustomModelChange = (providerId, model) => {
+    setCustomModels(prev => ({
       ...prev,
       [providerId]: model
     }));
@@ -123,6 +166,24 @@ export const ApiKeyModal = ({ isOpen, onClose, onSave }) => {
       }
     });
 
+    // 保存自定义URL
+    Object.entries(customUrls).forEach(([providerId, url]) => {
+      if (url && url.trim()) {
+        localStorage.setItem(`custom_url_${providerId}`, url.trim());
+      } else {
+        localStorage.removeItem(`custom_url_${providerId}`);
+      }
+    });
+
+    // 保存自定义模型名称
+    Object.entries(customModels).forEach(([providerId, model]) => {
+      if (model && model.trim()) {
+        localStorage.setItem(`custom_model_${providerId}`, model.trim());
+      } else {
+        localStorage.removeItem(`custom_model_${providerId}`);
+      }
+    });
+
     // 追踪API密钥配置事件
     try {
       track('api_keys_configured', {
@@ -135,7 +196,7 @@ export const ApiKeyModal = ({ isOpen, onClose, onSave }) => {
     }
 
     // 通知父组件
-    onSave({ apiKeys, models });
+    onSave({ apiKeys, models, customUrls, customModels });
     setHasChanges(false);
     onClose();
   };
@@ -228,27 +289,75 @@ export const ApiKeyModal = ({ isOpen, onClose, onSave }) => {
                 }}>
                   模型:
                 </label>
-                <select
-                  value={models[provider.id] || provider.defaultModel}
-                  onChange={(e) => handleModelChange(provider.id, e.target.value)}
-                  className="model-select"
-                  style={{
-                    flex: 1,
-                    padding: '0.5rem',
-                    borderRadius: '0.375rem',
-                    border: '1px solid #d1d5db',
-                    backgroundColor: '#ffffff',
-                    fontSize: '0.875rem',
-                    color: '#374151'
-                  }}
-                >
-                  {provider.availableModels.map(model => (
-                    <option key={model} value={model}>
-                      {model}
-                    </option>
-                  ))}
-                </select>
+                {provider.isCustom ? (
+                  <input
+                    type="text"
+                    value={customModels[provider.id] || ''}
+                    onChange={(e) => handleCustomModelChange(provider.id, e.target.value)}
+                    placeholder="输入模型名称，如: llama2, gpt-3.5-turbo"
+                    className="api-input"
+                    style={{
+                      flex: 1,
+                      padding: '0.5rem',
+                      borderRadius: '0.375rem',
+                      border: '1px solid #d1d5db',
+                      backgroundColor: '#ffffff',
+                      fontSize: '0.875rem',
+                      color: '#374151'
+                    }}
+                  />
+                ) : (
+                  <select
+                    value={models[provider.id] || provider.defaultModel}
+                    onChange={(e) => handleModelChange(provider.id, e.target.value)}
+                    className="model-select"
+                    style={{
+                      flex: 1,
+                      padding: '0.5rem',
+                      borderRadius: '0.375rem',
+                      border: '1px solid #d1d5db',
+                      backgroundColor: '#ffffff',
+                      fontSize: '0.875rem',
+                      color: '#374151'
+                    }}
+                  >
+                    {provider.availableModels.map(model => (
+                      <option key={model} value={model}>
+                        {model}
+                      </option>
+                    ))}
+                  </select>
+                )}
               </div>
+
+              {/* 自定义URL输入 */}
+              {provider.isCustom && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.75rem' }}>
+                  <label style={{ 
+                    fontSize: '0.875rem', 
+                    color: '#6b7280',
+                    minWidth: '60px'
+                  }}>
+                    API URL:
+                  </label>
+                  <input
+                    type="text"
+                    value={customUrls[provider.id] || ''}
+                    onChange={(e) => handleCustomUrlChange(provider.id, e.target.value)}
+                    placeholder="https://your-api.com/v1/chat/completions"
+                    className="api-input"
+                    style={{
+                      flex: 1,
+                      padding: '0.5rem',
+                      borderRadius: '0.375rem',
+                      border: '1px solid #d1d5db',
+                      backgroundColor: '#ffffff',
+                      fontSize: '0.875rem',
+                      color: '#374151'
+                    }}
+                  />
+                </div>
+              )}
             </div>
           ))}
         </div>
