@@ -1,9 +1,10 @@
 import plantumlEncoder from 'plantuml-encoder';
 import React, { useState, useEffect } from 'react';
 import { track } from '@vercel/analytics';
+import { createPortal } from 'react-dom';
 
 // 纯前端PlantUML渲染器，直接使用外部服务
-const PlantUMLViewer = ({ code, onCodeChange }) => {
+const PlantUMLViewer = ({ code, onCodeChange, onPreviewRequest }) => {
   const [svgContent, setSvgContent] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -199,11 +200,23 @@ const PlantUMLViewer = ({ code, onCodeChange }) => {
 
   return (
     <div className="plantuml-container">
-      {/* 渲染SVG内容 */}
-      <div className="svg-container" dangerouslySetInnerHTML={{ __html: svgContent }} />
+      {/* 渲染SVG内容 - 可点击放大 */}
+      <div 
+        className="svg-container clickable" 
+        onClick={() => onPreviewRequest && onPreviewRequest(svgContent)}
+        title="点击放大查看"
+        dangerouslySetInnerHTML={{ __html: svgContent }} 
+      />
       
       {/* 操作按钮 */}
       <div className="action-buttons">
+        <button
+          onClick={() => onPreviewRequest && onPreviewRequest(svgContent, code)}
+          className="btn btn-info"
+        >
+          🔍 放大查看
+        </button>
+
         <button
           onClick={() => {
             navigator.clipboard.writeText(code);
@@ -302,6 +315,39 @@ const PlantUMLViewer = ({ code, onCodeChange }) => {
 };
 
 export const PlantUMLRenderer = ({ content, onContentChange }) => {
+  const [previewContent, setPreviewContent] = useState(null);
+  const [previewCode, setPreviewCode] = useState('');
+  const [showGlobalPreview, setShowGlobalPreview] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editingCode, setEditingCode] = useState('');
+
+  // 处理模态框显示时的body滚动和ESC键
+  useEffect(() => {
+    if (showGlobalPreview) {
+      document.body.classList.add('modal-open');
+      
+      // ESC键关闭模态框
+      const handleEscape = (e) => {
+        if (e.key === 'Escape') {
+          setShowGlobalPreview(false);
+        }
+      };
+      
+      document.addEventListener('keydown', handleEscape);
+      
+      return () => {
+        document.removeEventListener('keydown', handleEscape);
+      };
+    } else {
+      document.body.classList.remove('modal-open');
+    }
+    
+    // 清理函数
+    return () => {
+      document.body.classList.remove('modal-open');
+    };
+  }, [showGlobalPreview]);
+
   if (!content) return null;
 
   const plantUMLMatches = content.match(/@startuml[\s\S]*?@enduml/g);
@@ -333,35 +379,224 @@ export const PlantUMLRenderer = ({ content, onContentChange }) => {
     }
   };
 
-  return (
-    <div className="plantuml-renderer">
-      {plantUMLMatches.map((diagram, index) => {
-        try {
-          const cleanedDiagram = diagram.trim();
-          console.log('PlantUML代码:', cleanedDiagram);
-          
-          // 验证PlantUML代码是否有效
-          if (!cleanedDiagram || cleanedDiagram.length < 10) {
-            throw new Error('PlantUML代码为空或过短');
+  // 下载PNG功能（全局）
+  const downloadPNG = async () => {
+    try {
+      if (!previewContent) return;
+      
+      // 创建一个Canvas来转换SVG为PNG
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      const img = new Image();
+      
+      // 创建SVG的Data URL
+      const svgBlob = new Blob([previewContent], { type: 'image/svg+xml;charset=utf-8' });
+      const svgUrl = URL.createObjectURL(svgBlob);
+      
+      img.onload = () => {
+        canvas.width = img.naturalWidth || 800;
+        canvas.height = img.naturalHeight || 600;
+        
+        // 设置白色背景
+        ctx.fillStyle = 'white';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        // 绘制SVG
+        ctx.drawImage(img, 0, 0);
+        
+        // 下载PNG
+        canvas.toBlob((blob) => {
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = 'plantuml-diagram.png';
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+          // 追踪PNG下载事件
+          try {
+            track('plantuml_png_downloaded', { 
+              canvas_width: canvas.width, 
+              canvas_height: canvas.height,
+              file_size: blob.size 
+            });
+          } catch (trackError) {
+            console.log('Analytics tracking failed:', trackError);
           }
-          
-          return (
-            <PlantUMLViewer 
-              key={index} 
-              code={cleanedDiagram}
-              onCodeChange={(newCode) => handleCodeChange(index, newCode)}
-            />
-          );
-        } catch (error) {
-          console.error('PlantUML处理错误:', error);
-          return (
-            <div key={index} className="plantuml-error">
-              <p className="error-message">PlantUML处理失败: {error.message}</p>
-              <pre className="code-content">{diagram}</pre>
+        }, 'image/png');
+        
+        URL.revokeObjectURL(svgUrl);
+      };
+      
+      img.src = svgUrl;
+    } catch (err) {
+      console.error('PNG下载失败:', err);
+      alert('PNG下载失败，请尝试下载SVG格式');
+    }
+  };
+
+  return (
+    <>
+      <div className="plantuml-renderer">
+        {plantUMLMatches.map((diagram, index) => {
+          try {
+            const cleanedDiagram = diagram.trim();
+            console.log('PlantUML代码:', cleanedDiagram);
+            
+            // 验证PlantUML代码是否有效
+            if (!cleanedDiagram || cleanedDiagram.length < 10) {
+              throw new Error('PlantUML代码为空或过短');
+            }
+            
+            return (
+              <PlantUMLViewer 
+                key={index} 
+                code={cleanedDiagram}
+                onCodeChange={(newCode) => handleCodeChange(index, newCode)}
+                onPreviewRequest={(svgContent, code) => {
+                  setPreviewContent(svgContent);
+                  setPreviewCode(code);
+                  setShowGlobalPreview(true);
+                }}
+              />
+            );
+          } catch (error) {
+            console.error('PlantUML处理错误:', error);
+            return (
+              <div key={index} className="plantuml-error">
+                <p className="error-message">PlantUML处理失败: {error.message}</p>
+                <pre className="code-content">{diagram}</pre>
+              </div>
+            );
+          }
+        })}
+      </div>
+
+      {/* 全局预览模态框 - 使用Portal渲染到body */}
+      {showGlobalPreview && previewContent && createPortal(
+        <div className="preview-modal-overlay" onClick={() => setShowGlobalPreview(false)}>
+          <div className="preview-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="preview-header">
+              <h3>UML图表预览</h3>
+              <button 
+                onClick={() => setShowGlobalPreview(false)}
+                className="close-btn"
+              >
+                ×
+              </button>
             </div>
-          );
-        }
-      })}
-    </div>
+            <div className="preview-content">
+              <div 
+                className="preview-svg-container" 
+                dangerouslySetInnerHTML={{ __html: previewContent }}
+              />
+            </div>
+            <div className="preview-footer">
+              <button
+                onClick={() => {
+                  navigator.clipboard.writeText(previewCode);
+                  alert('PlantUML代码已复制到剪贴板！');
+                  try {
+                    track('plantuml_code_copied', { code_length: previewCode.length });
+                  } catch (trackError) {
+                    console.log('Analytics tracking failed:', trackError);
+                  }
+                }}
+                className="btn btn-secondary"
+              >
+                📋 复制代码
+              </button>
+              <button
+                onClick={() => {
+                  const blob = new Blob([previewContent], { type: 'image/svg+xml' });
+                  const url = URL.createObjectURL(blob);
+                  const a = document.createElement('a');
+                  a.href = url;
+                  a.download = 'plantuml-diagram.svg';
+                  document.body.appendChild(a);
+                  a.click();
+                  document.body.removeChild(a);
+                  URL.revokeObjectURL(url);
+                  try {
+                    track('plantuml_svg_downloaded', { file_size: previewContent.length });
+                  } catch (trackError) {
+                    console.log('Analytics tracking failed:', trackError);
+                  }
+                }}
+                className="btn btn-primary"
+              >
+                💾 下载SVG
+              </button>
+              <button
+                onClick={downloadPNG}
+                className="btn btn-success"
+              >
+                🖼️ 下载PNG
+              </button>
+              <button
+                onClick={() => {
+                  setEditingCode(previewCode);
+                  setShowEditModal(true);
+                }}
+                className="btn btn-warning"
+              >
+                📝 编辑UML
+              </button>
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
+
+      {/* 编辑UML模态框 */}
+      {showEditModal && createPortal(
+        <div className="edit-modal-overlay" onClick={() => setShowEditModal(false)}>
+          <div className="edit-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>编辑PlantUML代码</h3>
+              <button 
+                onClick={() => setShowEditModal(false)}
+                className="close-btn"
+              >
+                ×
+              </button>
+            </div>
+            <div className="modal-body">
+              <textarea
+                value={editingCode}
+                onChange={(e) => setEditingCode(e.target.value)}
+                className="code-editor"
+                rows={20}
+                placeholder="输入PlantUML代码..."
+              />
+            </div>
+            <div className="modal-footer">
+              <button 
+                onClick={() => setShowEditModal(false)} 
+                className="btn btn-secondary"
+              >
+                取消
+              </button>
+              <button 
+                onClick={() => {
+                  // 找到并更新对应的PlantUML代码
+                  if (onContentChange) {
+                    const updatedContent = content.replace(previewCode, editingCode);
+                    onContentChange(updatedContent);
+                  }
+                  setShowEditModal(false);
+                  setShowGlobalPreview(false);
+                }} 
+                className="btn btn-primary"
+              >
+                保存并重新渲染
+              </button>
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
+    </>
   );
 };
